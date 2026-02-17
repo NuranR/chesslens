@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16
+    container_name: chesslens-db
+    environment:
+      POSTGRES_USER: chesslens
+      POSTGRES_PASSWORD: chesslens_dev
+      POSTGRES_DB: chesslens
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
