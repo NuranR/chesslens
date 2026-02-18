@@ -1,8 +1,10 @@
 import { useState } from "react";
 import axios from "axios";
 import { registerUser } from "../services/api";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Register() {
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,6 +19,7 @@ export default function Register() {
     try {
       await registerUser({ username, email, password });
       setSuccess(true);
+      setTimeout(() => navigate("/login"), 1500); // Send them to login after 1.5 seconds
       // Clear the form after success
       setUsername("");
       setEmail("");
@@ -96,6 +99,12 @@ export default function Register() {
             Sign Up
           </button>
         </form>
+        <p className="mt-4 text-center text-sm text-gray-400">
+          Already have an account?{" "}
+          <Link to="/login" className="text-sky-400 hover:underline">
+            Sign in
+          </Link>
+        </p>
       </div>
     </div>
   );

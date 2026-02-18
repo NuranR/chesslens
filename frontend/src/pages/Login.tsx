@@ -1,8 +1,10 @@
 import { useState } from "react";
 import axios from "axios";
 import { loginUser } from "../services/api";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Login() {
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -14,7 +16,7 @@ export default function Login() {
     try {
       const data = await loginUser({ username, password });
       localStorage.setItem("token", data.access_token);
-      alert("Login successful! Token saved.");
+      navigate("/dashboard");
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setError(err.response?.data?.detail || "Invalid username or password");
@@ -71,6 +73,12 @@ export default function Login() {
             Sign In
           </button>
         </form>
+        <p className="mt-4 text-center text-sm text-gray-400">
+          Don't have an account?{" "}
+          <Link to="/register" className="text-sky-400 hover:underline">
+            Sign up
+          </Link>
+        </p>
       </div>
     </div>
   );
