@@ -1,15 +1,36 @@
 services:
   db:
     image: postgres:16
-    container_name: chesslens-db
+    container_name: chesslens_db
+    restart: always
     environment:
-      POSTGRES_USER: chesslens
-      POSTGRES_PASSWORD: chesslens_dev
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: chesslens_pwd
       POSTGRES_DB: chesslens
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: chesslens_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://admin:chesslens_pwd@db:5432/chesslens
+      - SECRET_KEY=super_secret_dev_key_for_jwt_tokens
+
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_BUCKET_NAME=${AWS_BUCKET_NAME}
+    depends_on:
+      - db
 
 volumes:
   pgdata:
