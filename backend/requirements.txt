@@ -1,0 +1,21 @@
+# --- ML & Image Processing ---
+numpy<2.0.0
+opencv-python-headless
+Pillow
+python-chess
+tensorflow-cpu==2.16.1
+
+# --- FastAPI & Server ---
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic-settings
+
+# --- Database & ORM ---
+sqlalchemy
+asyncpg
+alembic
+
+# --- Authentication ---
+python-jose[cryptography]
+passlib[bcrypt]
