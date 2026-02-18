@@ -19,3 +19,5 @@ alembic
 # --- Authentication ---
 python-jose[cryptography]
 passlib[bcrypt]
+
+email-validator
