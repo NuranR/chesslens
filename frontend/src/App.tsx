@@ -1,11 +1,7 @@
-import "./App.css";
+import Login from "./pages/Login";
 
 function App() {
-  return (
-    <div className="flex h-screen items-center justify-center bg-gray-900">
-      <h1 className="text-5xl font-bold text-sky-400">Tailwind works!</h1>
-    </div>
-  );
+  return <Login />;
 }
 
 export default App;
