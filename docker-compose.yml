@@ -3,8 +3,8 @@ services:
     image: postgres:16
     container_name: chesslens-db
     environment:
-      POSTGRES_USER: chesslens
-      POSTGRES_PASSWORD: chesslens_dev
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: chesslens_pwd
       POSTGRES_DB: chesslens
     ports:
       - "5432:5432"
