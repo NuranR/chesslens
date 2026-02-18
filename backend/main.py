@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import auth, positions
+from routers import auth, positions, fen
 
 # Initialize the FastAPI application
 app = FastAPI(
@@ -22,6 +22,7 @@ app.add_middleware(
 # This mounts all routes from auth.py under the /api/auth prefix
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(positions.router, prefix="/api/positions", tags=["Positions"])
+app.include_router(fen.router, prefix="/api/fen", tags=["FEN Extraction"])
 
 @app.get("/")
 async def health_check():
