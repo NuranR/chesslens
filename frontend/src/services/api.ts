@@ -53,4 +53,17 @@ export const logoutUser = () => {
   window.location.href = "/login";
 };
 
+export const predictBoard = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file); // Must match the 'file' parameter in FastAPI
+
+  const response = await api.post("/ai/predict", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  
+  return response.data; // Expecting { fen: "...", lichess_url: "..." }
+};
+
 export default api;

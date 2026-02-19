@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import ChessboardDropzone from "../components/ChessboardDropzone";
+import { predictBoard } from "../services/api"; // Import the new API function
 
 export default function Home() {
   const navigate = useNavigate();
+  // Live check for guest vs logged-in state
   const isLoggedIn = !!localStorage.getItem("token");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
@@ -12,20 +14,23 @@ export default function Home() {
     navigate("/login");
   };
 
-  // This is where we will hook up your FastAPI backend!
   const handleAnalyzeBoard = async (file: File) => {
     setIsAnalyzing(true);
-    console.log("File ready for backend:", file.name);
 
-    // TODO: 1. Send file to FastAPI
-    // TODO: 2. Get FEN back
-    // TODO: 3. Redirect to Lichess
+    try {
+      // 1. Send the file to your FastAPI backend
+      const data = await predictBoard(file);
 
-    // Simulating a network request for now
-    setTimeout(() => {
+      console.log("AI Prediction FEN:", data.fen);
+
+      // 2. Snap open the Lichess board editor in a new tab!
+      window.open(data.lichess_url, "_blank", "noopener,noreferrer");
+    } catch (error) {
+      console.error("Prediction failed:", error);
+      alert("Failed to analyze the board. Ensure the backend is running.");
+    } finally {
       setIsAnalyzing(false);
-      alert("Backend connection coming next!");
-    }, 2000);
+    }
   };
 
   return (
@@ -72,12 +77,10 @@ export default function Home() {
           <h2 className="text-5xl font-extrabold mb-4 tracking-tight">
             Scan. Analyze. <span className="text-sky-400">Win.</span>
           </h2>
-          <p className="text-gray-400 text-lg">
-            Upload a board photo to get an instant FEN and Lichess analysis.
-          </p>
+          <p className="text-gray-400 text-lg"></p>
         </header>
 
-        {/* Look how clean this is! */}
+        {/* The Drag & Drop Component handles the preview and button internally */}
         <ChessboardDropzone
           onAnalyze={handleAnalyzeBoard}
           isAnalyzing={isAnalyzing}
