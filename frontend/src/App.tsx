@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Layout from "./components/Layout";
 import AuthGuard from "./components/AuthGuard";
+import Library from "./pages/Library";
 
 function App() {
   return (
@@ -18,9 +19,7 @@ function App() {
           path="/library"
           element={
             <AuthGuard>
-              <div className="text-white">
-                Your Saved Games Library Coming Soon...
-              </div>
+              <Library />
             </AuthGuard>
           }
         />

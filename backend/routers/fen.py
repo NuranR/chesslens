@@ -6,6 +6,8 @@ from auth import get_current_user
 from sqlalchemy.ext.asyncio import AsyncSession
 import models
 from database import get_db
+from sqlalchemy.future import select
+from models import Position
 
 router = APIRouter()
 
@@ -64,3 +66,15 @@ async def upload_image(
         print(f"Upload/Database Error: {e}")
         await db.rollback() 
         raise HTTPException(status_code=500, detail="Failed to save board to cloud storage.")
+    
+@router.get("/library")
+async def get_user_library(
+    db: AsyncSession = Depends(get_db), 
+    current_user = Depends(get_current_user)
+):
+    # Fetch all positions belonging to the logged-in user, newest first
+    query = select(Position).where(Position.user_id == current_user.id).order_by(Position.created_at.desc())
+    result = await db.execute(query)
+    positions = result.scalars().all()
+    
+    return positions

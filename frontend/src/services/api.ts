@@ -88,4 +88,17 @@ export const saveBoardToLibrary = async (file: File, fen: string) => {
   return response.data;
 };
 
+export const getUserLibrary = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No token found");
+
+  const response = await axios.get("http://localhost:8000/api/fen/library", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data; // Expecting an array of { id, fen, image_url, created_at }
+};
+
 export default api;
