@@ -78,3 +78,41 @@ async def get_user_library(
     positions = result.scalars().all()
     
     return positions
+
+@router.delete("/library/{board_id}")
+async def delete_saved_board(
+    board_id: int,
+    current_user: models.User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Deletes a saved board from both PostgreSQL and AWS S3."""
+    
+    # 1. Find the board in the database and ensure it belongs to the user
+    query = select(models.Position).where(
+        models.Position.id == board_id, 
+        models.Position.user_id == current_user.id
+    )
+    result = await db.execute(query)
+    board = result.scalar_one_or_none()
+    
+    if not board:
+        raise HTTPException(status_code=404, detail="Board not found or unauthorized")
+        
+    # 2. Extract the S3 Object Key from the URL
+    # URL looks like: https://bucket.s3.region.amazonaws.com/boards/user2/uuid.png
+    # S3 just wants the key: boards/user2/uuid.png
+    try:
+        s3_key = board.image_path.split(".amazonaws.com/")[-1]
+        s3_client.delete_object(
+            Bucket=settings.AWS_BUCKET_NAME,
+            Key=s3_key
+        )
+    except Exception as e:
+        print(f"AWS S3 Deletion Error: {e}")
+        # Delete from the DB even if S3 fails, so you don't get ghost records in your UI
+        
+    # 3. Delete from Postgres
+    await db.delete(board)
+    await db.commit()
+    
+    return {"message": "Board successfully completely deleted"}

@@ -101,4 +101,13 @@ export const getUserLibrary = async () => {
   return response.data; // Expecting an array of { id, fen, image_url, created_at }
 };
 
+export const deleteBoardFromLibrary = async (boardId: string | number) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No token found");
+
+  await axios.delete(`http://localhost:8000/api/fen/library/${boardId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
 export default api;
