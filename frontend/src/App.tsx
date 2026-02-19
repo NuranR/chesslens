@@ -2,22 +2,29 @@ import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
+import Layout from "./components/Layout";
+import AuthGuard from "./components/AuthGuard";
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route element={<Layout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-      <Route
-        path="/dashboard"
-        element={
-          <div className="flex h-screen items-center justify-center bg-gray-900 text-3xl font-bold text-sky-400">
-            Chess Dashboard Coming Soon...
-          </div>
-        }
-      />
+        {/* Protected routes */}
+        <Route
+          path="/library"
+          element={
+            <AuthGuard>
+              <div className="text-white">
+                Your Saved Games Library Coming Soon...
+              </div>
+            </AuthGuard>
+          }
+        />
+      </Route>
     </Routes>
   );
 }

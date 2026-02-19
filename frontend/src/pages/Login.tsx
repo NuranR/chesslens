@@ -16,7 +16,7 @@ export default function Login() {
     try {
       const data = await loginUser({ username, password });
       localStorage.setItem("token", data.access_token);
-      navigate("/dashboard");
+      navigate("/library");
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setError(err.response?.data?.detail || "Invalid username or password");
