@@ -1,9 +1,11 @@
 import boto3
 import uuid
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, status
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Form, Depends
 from config import settings
 from auth import get_current_user
+from sqlalchemy.ext.asyncio import AsyncSession
 import models
+from database import get_db
 
 router = APIRouter()
 
@@ -18,19 +20,19 @@ s3_client = boto3.client(
 @router.post("/upload")
 async def upload_image(
     file: UploadFile = File(...),
-    current_user: models.User = Depends(get_current_user)
+    fen: str = Form(...),
+    current_user: models.User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
 ):
-    """Uploads a chessboard image to AWS S3 and returns the public URL."""
-    # 1. Validate it's actually an image
+    """Uploads a chessboard image to AWS S3 and saves it to the user's library."""
     if not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="File must be an image format (jpeg, png, etc.)")
+        raise HTTPException(status_code=400, detail="File must be an image format.")
 
-    # 2. Generate a secure, unique filename (e.g., username/1234-abcd.png)
     file_extension = file.filename.split(".")[-1]
     unique_filename = f"boards/{current_user.username}/{uuid.uuid4()}.{file_extension}"
 
     try:
-        # 3. Upload the file stream to S3
+        # Upload to S3
         s3_client.upload_fileobj(
             file.file,
             settings.AWS_BUCKET_NAME,
@@ -38,14 +40,27 @@ async def upload_image(
             ExtraArgs={"ContentType": file.content_type}
         )
         
-        # 4. Construct the final URL
         s3_url = f"https://{settings.AWS_BUCKET_NAME}.s3.{settings.AWS_REGION}.amazonaws.com/{unique_filename}"
+
+        # Create the Database Record
+        new_position = models.Position(
+            user_id=current_user.id,
+            fen=fen,
+            image_path=s3_url
+        )
+        
+        # Save to Database
+        db.add(new_position)
+        await db.commit()        
+        await db.refresh(new_position) 
         
         return {
-            "message": "Image successfully uploaded to S3", 
-            "image_url": s3_url
+            "message": "Image successfully uploaded and saved to library", 
+            "image_url": s3_url,
+            "id": new_position.id
         }
         
     except Exception as e:
-        print(f"AWS S3 Upload Error: {e}")
-        raise HTTPException(status_code=500, detail="Failed to upload image to cloud storage.")
+        print(f"Upload/Database Error: {e}")
+        await db.rollback() 
+        raise HTTPException(status_code=500, detail="Failed to save board to cloud storage.")
