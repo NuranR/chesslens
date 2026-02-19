@@ -1,8 +1,10 @@
 import { useState } from "react";
 import ChessboardDropzone from "../components/ChessboardDropzone";
 import { predictBoard, saveBoardToLibrary } from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
+  const navigate = useNavigate();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const isLoggedIn = !!localStorage.getItem("token");
 
@@ -10,23 +12,24 @@ export default function Home() {
     setIsAnalyzing(true);
 
     try {
-      // 1. Send the file to your FastAPI backend
+      // 1. Get Prediction
       const data = await predictBoard(file);
 
-      console.log("AI Prediction FEN:", data.fen);
-
-      // 2. Snap open the Lichess board editor in a new tab!
+      // 2. Open Lichess immediately
       window.open(data.lichess_url, "_blank", "noopener,noreferrer");
 
-      // 3. Save to DB in the background
+      // 3. Save & Redirect
       if (isLoggedIn) {
-        saveBoardToLibrary(file, data.fen)
-          .then(() =>
-            console.log(
-              "✅ Successfully saved to your library in the background!",
-            ),
-          )
-          .catch((err) => console.error("⚠️ Background save failed:", err));
+        try {
+          // Wait for the save to complete so we get the ID
+          const savedBoard = await saveBoardToLibrary(file, data.fen);
+          console.log("Saved!", savedBoard);
+
+          // Redirect to the new Details page
+          navigate(`/board/${savedBoard.id}`);
+        } catch (saveError) {
+          console.error("Background save failed:", saveError);
+        }
       }
     } catch (error) {
       console.error("Prediction failed:", error);

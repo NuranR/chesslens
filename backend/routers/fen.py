@@ -8,6 +8,7 @@ import models
 from database import get_db
 from sqlalchemy.future import select
 from models import Position
+from schemas import PositionUpdate
 
 router = APIRouter()
 
@@ -116,3 +117,57 @@ async def delete_saved_board(
     await db.commit()
     
     return {"message": "Board successfully completely deleted"}
+
+@router.patch("/library/{board_id}")
+async def update_saved_board(
+    board_id: int,
+    board_data: PositionUpdate,
+    current_user: models.User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Updates a saved board's FEN, category, or notes."""
+    
+    # 1. Fetch the board and verify ownership
+    query = select(models.Position).where(
+        models.Position.id == board_id, 
+        models.Position.user_id == current_user.id
+    )
+    result = await db.execute(query)
+    board = result.scalar_one_or_none()
+    
+    if not board:
+        raise HTTPException(status_code=404, detail="Board not found or unauthorized")
+        
+    # 2. Update only the fields the frontend actually sent
+    if board_data.fen is not None:
+        board.fen = board_data.fen
+    if board_data.category is not None:
+        board.category = board_data.category
+    if board_data.notes is not None:
+        board.notes = board_data.notes
+        
+    # 3. Save the changes to the hard drive
+    await db.commit()
+    await db.refresh(board)
+    
+    return {"message": "Board successfully updated", "board_id": board.id}
+
+# To fetch a specific board to edit details
+@router.get("/library/{board_id}")
+async def get_single_board(
+    board_id: int,
+    current_user: models.User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Fetches a single board's details for the edit page."""
+    query = select(models.Position).where(
+        models.Position.id == board_id, 
+        models.Position.user_id == current_user.id
+    )
+    result = await db.execute(query)
+    board = result.scalar_one_or_none()
+    
+    if not board:
+        raise HTTPException(status_code=404, detail="Board not found")
+        
+    return board

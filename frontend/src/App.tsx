@@ -5,6 +5,7 @@ import Register from "./pages/Register";
 import Layout from "./components/Layout";
 import AuthGuard from "./components/AuthGuard";
 import Library from "./pages/Library";
+import BoardDetails from "./pages/BoardDetails";
 
 function App() {
   return (
@@ -24,6 +25,14 @@ function App() {
           }
         />
       </Route>
+      <Route
+        path="/board/:id"
+        element={
+          <AuthGuard>
+            <BoardDetails />
+          </AuthGuard>
+        }
+      />
     </Routes>
   );
 }

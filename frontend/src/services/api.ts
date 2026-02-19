@@ -110,4 +110,34 @@ export const deleteBoardFromLibrary = async (boardId: string | number) => {
   });
 };
 
+// Fetch a single board by ID
+export const getBoard = async (id: string) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No token found");
+
+  const response = await axios.get(
+    `http://localhost:8000/api/fen/library/${id}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+  return response.data;
+};
+
+// Update a board (FEN, Category, Notes)
+export const updateBoard = async (
+  id: string,
+  updates: { fen?: string; category?: string; notes?: string },
+) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No token found");
+
+  const response = await axios.patch(
+    `http://localhost:8000/api/fen/library/${id}`,
+    updates,
+    { headers: { Authorization: `Bearer ${token}` } },
+  );
+  return response.data;
+};
+
 export default api;

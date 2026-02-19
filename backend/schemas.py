@@ -18,6 +18,7 @@ class PositionCreate(PositionBase):
 
 class PositionUpdate(BaseModel):
     """Schema for updating an existing position. All fields optional."""
+    fen: Optional[str] = None
     category: Optional[str] = None
     notes: Optional[str] = None
 
