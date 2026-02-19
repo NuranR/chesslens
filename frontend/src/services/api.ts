@@ -47,4 +47,10 @@ export const registerUser = async (userData: {
   return response.data;
 };
 
+export const logoutUser = () => {
+  localStorage.removeItem("token");
+  // Optional: Redirect or refresh the page
+  window.location.href = "/login";
+};
+
 export default api;
