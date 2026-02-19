@@ -40,7 +40,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
+    <div className="min-h-[calc(100vh-9rem)] bg-gray-900 text-white p-8">
       <div className="max-w-2xl mx-auto text-center">
         <header className="mb-12">
           <h2 className="text-5xl font-extrabold mb-4 tracking-tight">

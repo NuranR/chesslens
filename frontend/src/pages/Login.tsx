@@ -27,7 +27,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-gray-900">
+    <div className="flex min-h-[calc(100vh-9rem)] items-center justify-center bg-gray-900">
       <div className="w-full max-w-md rounded-lg bg-gray-800 p-8 shadow-lg">
         <h2 className="mb-6 text-3xl font-bold text-white text-center">
           ChessLens

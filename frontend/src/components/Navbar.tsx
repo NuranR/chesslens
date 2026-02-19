@@ -12,7 +12,7 @@ export default function Navbar() {
 
   return (
     // Added p-8 for spacing, and max-w-7xl mx-auto to align with the rest of the page
-    <nav className="flex justify-between items-center mb-12 p-8 max-w-7xl mx-auto w-full">
+    <nav className="flex justify-between items-center p-8 max-w-7xl mx-auto w-full">
       {/* Logo as Home Button */}
       <Link
         to="/"

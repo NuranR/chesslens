@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getUserLibrary, deleteBoardFromLibrary } from "../services/api";
+import { Link } from "react-router-dom";
 
 interface SavedBoard {
   id: string | number;
@@ -60,7 +61,7 @@ export default function Library() {
   };
 
   return (
-    <div className="mt-8">
+    <div className="mt-1">
       <header className="mb-10">
         <h2 className="text-4xl font-extrabold text-white tracking-tight">
           My <span className="text-sky-400">Library</span>
@@ -81,14 +82,22 @@ export default function Library() {
               key={board.id}
               className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 hover:border-sky-500/50 transition-colors shadow-lg flex flex-col"
             >
-              {/* S3 Image Preview */}
-              <div className="aspect-square bg-gray-900 relative">
+              <Link
+                to={`/board/${board.id}`}
+                className="block relative aspect-square bg-gray-900 overflow-hidden cursor-pointer"
+              >
                 <img
                   src={board.image_path}
                   alt="Chessboard"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-              </div>
+                {/* Hover overlay hint */}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <span className="text-white font-bold border border-white/30 px-4 py-2 rounded-full bg-black/50 backdrop-blur-sm">
+                    Edit / Notes
+                  </span>
+                </div>
+              </Link>
 
               <div className="p-5 flex flex-col grow">
                 <p className="text-xs text-gray-400 mb-2">
