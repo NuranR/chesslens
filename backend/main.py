@@ -3,27 +3,27 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import os
 
-from routers import auth, positions, fen
-
 from ml.predictor import ChessPredictor 
-
-ml_models = {}
+from routers import auth, positions, fen, predict
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    model_path = "ml/piece_classifier_model.tflite" 
+    model_path = "ml/piece_classifier_model.tflite"
     
     if os.path.exists(model_path):
         print(f"🧠 Loading ChessLens AI Model from {model_path}...")
-        ml_models["piece_classifier"] = ChessPredictor(model_path)
+        # Attach it to the app's state backpack
+        app.state.piece_classifier = ChessPredictor(model_path)
         print("✅ Model loaded successfully.")
     else:
         print(f"⚠️ WARNING: Model not found at {model_path}. AI features will not work.")
-        ml_models["piece_classifier"] = None
+        app.state.piece_classifier = None
     
     yield
     
-    ml_models.clear()
+    # Clean up on shutdown
+    if getattr(app.state, "piece_classifier", None):
+        del app.state.piece_classifier
     print("🛑 Model unloaded.")
 
 # Initialize the FastAPI application
@@ -46,7 +46,8 @@ app.add_middleware(
 # This mounts all routes from auth.py under the /api/auth prefix
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(positions.router, prefix="/api/positions", tags=["Positions"])
-app.include_router(fen.router, prefix="/api/fen", tags=["FEN Extraction"])
+app.include_router(fen.router, prefix="/api/fen", tags=["Image Upload"])
+app.include_router(predict.router, prefix="/api/ai", tags=["FEN Extraction"])
 
 @app.get("/")
 async def health_check():
