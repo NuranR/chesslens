@@ -62,8 +62,30 @@ export const predictBoard = async (file: File) => {
       "Content-Type": "multipart/form-data",
     },
   });
-  
+
   return response.data; // Expecting { fen: "...", lichess_url: "..." }
+};
+
+export const saveBoardToLibrary = async (file: File, fen: string) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No token found");
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("fen", fen); // Pass the FEN so the backend doesn't have to calculate it again
+
+  const response = await axios.post(
+    "http://localhost:8000/api/fen/upload",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`, // Protect the route
+      },
+    },
+  );
+
+  return response.data;
 };
 
 export default api;

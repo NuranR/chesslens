@@ -1,9 +1,10 @@
 import { useState } from "react";
 import ChessboardDropzone from "../components/ChessboardDropzone";
-import { predictBoard } from "../services/api"; // Import the new API function
+import { predictBoard, saveBoardToLibrary } from "../services/api";
 
 export default function Home() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const isLoggedIn = !!localStorage.getItem("token");
 
   const handleAnalyzeBoard = async (file: File) => {
     setIsAnalyzing(true);
@@ -16,6 +17,17 @@ export default function Home() {
 
       // 2. Snap open the Lichess board editor in a new tab!
       window.open(data.lichess_url, "_blank", "noopener,noreferrer");
+
+      // 3. Save to DB in the background
+      if (isLoggedIn) {
+        saveBoardToLibrary(file, data.fen)
+          .then(() =>
+            console.log(
+              "✅ Successfully saved to your library in the background!",
+            ),
+          )
+          .catch((err) => console.error("⚠️ Background save failed:", err));
+      }
     } catch (error) {
       console.error("Prediction failed:", error);
       alert("Failed to analyze the board. Ensure the backend is running.");
