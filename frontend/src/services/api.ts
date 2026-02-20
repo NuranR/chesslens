@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Create a centralized Axios instance
 const api = axios.create({
-  baseURL: "http://localhost:8000/api",
+  baseURL: "http://47.130.165.30:8000/api",
   headers: {
     "Content-Type": "application/json",
   },
