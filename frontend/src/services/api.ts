@@ -74,16 +74,12 @@ export const saveBoardToLibrary = async (file: File, fen: string) => {
   formData.append("file", file);
   formData.append("fen", fen); // Pass the FEN so the backend doesn't have to calculate it again
 
-  const response = await axios.post(
-    "http://localhost:8000/api/fen/upload",
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`, // Protect the route
-      },
+  const response = await api.post("/fen/upload", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${token}`, // Protect the route
     },
-  );
+  });
 
   return response.data;
 };
@@ -92,7 +88,7 @@ export const getUserLibrary = async () => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No token found");
 
-  const response = await axios.get("http://localhost:8000/api/fen/library", {
+  const response = await api.get("/fen/library", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -105,7 +101,7 @@ export const deleteBoardFromLibrary = async (boardId: string | number) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No token found");
 
-  await axios.delete(`http://localhost:8000/api/fen/library/${boardId}`, {
+  await api.delete(`/fen/library/${boardId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
@@ -115,12 +111,9 @@ export const getBoard = async (id: string) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No token found");
 
-  const response = await axios.get(
-    `http://localhost:8000/api/fen/library/${id}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    },
-  );
+  const response = await api.get(`/fen/library/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return response.data;
 };
 
@@ -132,11 +125,9 @@ export const updateBoard = async (
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No token found");
 
-  const response = await axios.patch(
-    `http://localhost:8000/api/fen/library/${id}`,
-    updates,
-    { headers: { Authorization: `Bearer ${token}` } },
-  );
+  const response = await api.patch(`/fen/library/${id}`, updates, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return response.data;
 };
 
