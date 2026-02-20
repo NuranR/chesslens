@@ -23,7 +23,7 @@ services:
       - ./backend:/app
     environment:
       - DATABASE_URL=postgresql+asyncpg://admin:chesslens_pwd@db:5432/chesslens
-      - SECRET_KEY=super_secret_dev_key_for_jwt_tokens
+      - SECRET_KEY=${SECRET_KEY}
 
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
