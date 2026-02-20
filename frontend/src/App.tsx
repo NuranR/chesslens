@@ -2,20 +2,35 @@ import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
+import Layout from "./components/Layout";
+import AuthGuard from "./components/AuthGuard";
+import Library from "./pages/Library";
+import BoardDetails from "./pages/BoardDetails";
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route element={<Layout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
+        {/* Protected routes */}
+        <Route
+          path="/library"
+          element={
+            <AuthGuard>
+              <Library />
+            </AuthGuard>
+          }
+        />
+      </Route>
       <Route
-        path="/dashboard"
+        path="/board/:id"
         element={
-          <div className="flex h-screen items-center justify-center bg-gray-900 text-3xl font-bold text-sky-400">
-            Chess Dashboard Coming Soon...
-          </div>
+          <AuthGuard>
+            <BoardDetails />
+          </AuthGuard>
         }
       />
     </Routes>

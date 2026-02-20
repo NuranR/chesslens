@@ -114,7 +114,7 @@ export default function ChessboardDropzone({
             {isAnalyzing ? (
               <span className="animate-pulse">Analyzing Board...</span>
             ) : (
-              "Analyze on Lichess"
+              "Analyze"
             )}
           </button>
         </div>
